@@ -1,3 +1,4 @@
+
 class Calculator:
     """
     Singleton Calculator instance performs basic calculations on numbers.
@@ -11,89 +12,124 @@ class Calculator:
     """
 
     def add(_self, a, b):
-        """
-        Add two numbers.
 
-        Args:
-            a: the base number.
-            b: the number to add.
+        return _self._convert(a) + _self._convert(b)
 
-        Returns:
-            The sum of both numbers.
-
-        Raises:
-            ValueError: If an input number is not valid or not understood.
-        """
-        return a + b
-    
     def sub(_self, a, b):
-        """
-        Subtract two numbers.
+        
+        return _self._convert(a) - _self._convert(b)
 
-        Args:
-            a: the base number.
-            b: the number to subtract.
-
-        Returns:
-            The subtration of both numbers.
-
-        Raises:
-            ValueError: If an input number is not valid or not understood.
-        """
-        return 0
-    
     def mul(_self, a, b):
-        """
-        Multiply two numbers.
+       
+        return _self._convert(a) * _self._convert(b)
 
-        Args:
-            a: the base number.
-            b: the number to multiply.
-
-        Returns:
-            The product of both numbers.
-
-        Raises:
-            ValueError: If an input number is not valid or not understood.
-        """
-        return 0
-    
     def div(_self, a, b):
-        """
-        Divide two numbers.
+        
+        a = _self._convert(a)
+        b = _self._convert(b)
 
-        Args:
-            a: the base number.
-            b: the number to divide.
+        if b == 0:
+            return float('inf')
 
-        Returns:
-            The division of both numbers.
+        return a / b
 
-        Raises:
-            ValueError: If an input number is not valid or not understood.
-            ZeroDivisionError: If a division by 0 is attempted.
-        """
-        return 0
-    
     def factorize(_self, n):
-        """
-        Factorize number into prime factors.
+      
+        n = int(_self._convert(n))
 
-        Args:
-            n: the number to factorize into prime factors.
+        if n < 0:
+            raise ValueError("Cannot factorize a negative number")
 
-        Returns:
-            The list of prime factors.
+        factors = []
+        divisor = 2
 
-        Raises:
-            ValueError: If an input number is not valid, not understood or negative.
-        """
-        return []
+        while n > 1:
+            while n % divisor == 0:
+                factors.append(divisor)
+                n //= divisor
+            divisor += 1
+
+        return factors
+
+    def _convert(_self, value):
+        """Convert supported number representations into numeric values."""
+
+        if value is None:
+            return 0
+
+        if isinstance(value, (int, float)):
+            return value
+
+        if not isinstance(value, str):
+            return 0
+
+        value = value.strip().lower()
+
+        if not value:
+            return 0
+
+        # Numeric strings
+        try:
+            number = float(value)
+            return int(number) if number.is_integer() else number
+        except ValueError:
+            pass
+
+        # Number words in different languages
+        words = {
+            "zero": 0, "one": 1, "two": 2, "three": 3,
+            "four": 4, "five": 5, "six": 6, "seven": 7,
+            "eight": 8, "nine": 9, "ten": 10,
+
+            "null": 0, "eins": 1, "zwei": 2, "drei": 3,
+            "vier": 4, "fünf": 5, "fuenf": 5,
+            "sechs": 6, "sieben": 7, "acht": 8,
+            "neun": 9, "zehn": 10,
+
+            "uno": 1, "dos": 2, "tres": 3, "cuatro": 4,
+            "cinco": 5, "seis": 6, "siete": 7,
+            "ocho": 8, "nueve": 9, "diez": 10,
+
+            "один": 1, "два": 2, "три": 3, "четыре": 4,
+            "пять": 5, "шесть": 6, "семь": 7,
+            "восемь": 8, "девять": 9, "десять": 10,
+
+            "一": 1, "二": 2, "三": 3, "四": 4,
+            "五": 5, "六": 6, "七": 7, "八": 8,
+            "九": 9, "十": 10,
+        }
+
+        if value in words:
+            return words[value]
+
+        # Roman numerals
+        roman = {
+            "i": 1, "v": 5, "x": 10,
+            "l": 50, "c": 100, "d": 500, "m": 1000
+        }
+
+        if all(char in roman for char in value):
+            total = 0
+
+            for i in range(len(value)):
+                current = roman[value[i]]
+
+                if i + 1 < len(value) and current < roman[value[i + 1]]:
+                    total -= current
+                else:
+                    total += current
+
+            return total
+
+        # Unknown strings default to zero
+        return 0
 
     _instance = None
 
+    def __new__(cls):
+        if cls._instance is None:
+            cls._instance = super().__new__(cls)
+        return cls._instance
+
     def __init__(self):
         pass
-
-    # Singleton pattern by overloading the new operator, see
-    # https://stackoverflow.com/questions/31875/is-there-a-simple-elegant-way-to-define-singletons
