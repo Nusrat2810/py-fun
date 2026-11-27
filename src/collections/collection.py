@@ -65,7 +65,7 @@ class Collection(Generic[T]):
         """
         Return a new collection of two-item tuples zipped from the input collections.
         """
-        result = cls()
+        result: Collection[tuple] = Collection()
         for pair in zip(l1, l2):
             result.add(pair) # type: ignore
         return result # type: ignore
